@@ -37,13 +37,19 @@ def get_vector_store(text_chunks, model_name, api_key=None):
 def get_conversational_chain(model_name, vectorstore=None, api_key=None):
     if model_name == "Google AI":
         prompt_template = """
-        Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-        provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
-        Context:\n {context}?\n
-        Question: \n{question}\n
+        Answer the question as detailed as possible from the provided context, make sure to provide all the details. 
+        If the answer is not in the provided context just say, "answer is not available in the context", don't provide the wrong answer.
+        Do not include any code or code formatting in your answer. Only give plain explanatory text, no markdown code blocks.
+
+        Context:
+        {context}
+
+        Question: 
+        {question}
 
         Answer:
         """
+
         model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3, google_api_key=api_key)
         prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
         chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
@@ -147,9 +153,9 @@ def user_input(user_question, model_name, api_key, pdf_docs, conversation_histor
         df = pd.DataFrame(st.session_state.conversation_history, columns=["Question", "Answer", "Model", "Timestamp", "PDF Name"])
         csv = df.to_csv(index=False)
         b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="conversation_history.csv"><button>Download conversation history as CSV file</button></a>'
-        st.sidebar.markdown(href, unsafe_allow_html=True)
-        st.markdown("To download the conversation, click the Download button on the left side at the bottom of the conversation.")
+        # href = f'<a href="data:file/csv;base64,{b64}" download="conversation_history.csv"><button>Download conversation history as CSV file</button></a>'
+        # st.sidebar.markdown(href, unsafe_allow_html=True)
+        # st.markdown("To download the conversation, click the Download button on the left side at the bottom of the conversation.")
 
 def main():
     st.set_page_config(page_title="Chat with multiple PDFs", page_icon=":books:")
