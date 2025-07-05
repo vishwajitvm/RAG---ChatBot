@@ -1,0 +1,38 @@
+
+# LangChain Core
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+
+
+# Anthropic Integration
+langchain-anthropic
+
+# Google Gemini (PaLM) Integration
+langchain-google-genai
+google-generativeai
+tiktoken 
+google-ai-generativelanguage
+
+# Hugging Face Integration
+langchain-huggingface
+huggingface-hub
+huggingface_hub
+
+
+# Environment Variable Management
+python-dotenv
+
+# Machine Learning Utilities
+numpy
+scikit-learn
+
+#other utilities
+streamlit
+faiss-cpu
+pandas
+sentence-transformers
+transformers
+wikipedia
+# pip install -U langchain-community pypdf
