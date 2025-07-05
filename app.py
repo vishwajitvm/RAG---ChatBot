@@ -159,7 +159,7 @@ def user_input(user_question, model_name, api_key, pdf_docs, conversation_histor
 
 def main():
     st.set_page_config(page_title="Chat with multiple PDFs", page_icon=":books:")
-    st.header("Chat with multiple PDFs (v1) :books:")
+    st.header("RAG: VMChat with multiple PDFs :books:")
 
     if 'conversation_history' not in st.session_state:
         st.session_state.conversation_history = []
