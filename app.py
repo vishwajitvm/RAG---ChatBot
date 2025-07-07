@@ -25,7 +25,12 @@ def get_text_chunks(text, model_name):
     if model_name == "Google AI":
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
     chunks = text_splitter.split_text(text)
-    print(f"Number of text chunks created: {len(chunks)}")
+    # print(f"Number of text chunks created: {len(chunks)}")
+    print(f">>>>> Number of text chunks created: {len(chunks)}")
+    
+    # Log first 100 characters of each chunk
+    for i, chunk in enumerate(chunks):
+        print(f"========>Chunk {i+1} preview: {chunk[:100]}...\n")
     return chunks
 
 def get_vector_store(text_chunks, model_name, api_key=None):
@@ -35,7 +40,7 @@ def get_vector_store(text_chunks, model_name, api_key=None):
     # Console log each chunk embedding with length
     for i, chunk in enumerate(text_chunks):
         embed_vector = embeddings.embed_query(chunk)
-        print(f"[2️⃣] Embedding for chunk {i+1} (length: {len(embed_vector)}): {embed_vector[:10]}...")  # Print first 10 numbers + length
+        print(f"===>>>Embedding for chunk {i+1} (length: {len(embed_vector)}): {embed_vector[:10]}...")  # Print first 10 numbers + length
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local("faiss_index")
     return vector_store
@@ -73,7 +78,7 @@ def user_input(user_question, model_name, api_key, pdf_docs, conversation_histor
         embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=api_key)
         # Console log user question embedding with length
         query_embedding = embeddings.embed_query(user_question)
-        print(f"[3️⃣] Embedding vector for user question (length: {len(query_embedding)}): {query_embedding[:10]}...")
+        print(f"********* Embedding vector for user question (length: {len(query_embedding)}): {query_embedding[:10]}...")
         new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
         docs = new_db.similarity_search(user_question)
         chain = get_conversational_chain("Google AI", vectorstore=new_db, api_key=api_key)
@@ -209,7 +214,29 @@ def main():
         if st.button("Submit & Process"):
             if pdf_docs:
                 with st.spinner("Processing..."):
-                    st.success("Done")
+                    text = get_pdf_text(pdf_docs)
+                    text_chunks = get_text_chunks(text, model_name)
+
+                    # Create embeddings instance
+                    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=api_key)
+
+                    all_vectors = []
+                    for i, chunk in enumerate(text_chunks):
+                        embed_vector = embeddings.embed_query(chunk)
+                        all_vectors.append(embed_vector)
+
+                        # Print top 100 only
+                        if i < 100:
+                            print(f"[FIRE:] Embedding {i+1} (length: {len(embed_vector)}): {embed_vector[:10]}...")
+
+                    print(f"\n CHECK: Total number of embeddings pushed: {len(all_vectors)}")
+
+                    # Save vector store
+                    vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
+                    vector_store.save_local("faiss_index")
+
+                    st.success("PDF processed! Check console for chunks and embeddings.")
+                    # st.success("Done")
             else:
                 st.warning("Please upload PDF files before processing.")
 
